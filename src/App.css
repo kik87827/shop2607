@@ -1,5 +1,5 @@
 .App{text-align: center; letter-spacing: -0.8p;}
 .App-logo{height:40vmin; pointer-events: none;}
 .main-bg{height:300px; /* background:url("./assets/shoebg.png") no-repeat 50% 50%/cover */background-size:cover;background-repeat:no-repeat;background-position:50% 50%;}
-
+.alert-warning{background:yellow;text-align: center; padding:30px;}
 img{max-width:100%;}

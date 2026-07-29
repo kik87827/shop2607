@@ -6,9 +6,13 @@ import { useState } from "react";
 import ProductItem from "./components/ProductItem.jsx";
 import { Link, Outlet, Route, Routes, useNavigate } from "react-router-dom";
 import Detail from "./pages/Detail.jsx";
+import axios from "axios";
 
 function App() {
   let [shoes, setShoes] = useState(shoesData);
+  let [more, setMore] = useState(0);
+  let [moreBtn, setMoreBtn] = useState(true);
+  let [loading,setLoading] = useState(false)
   let navigate = useNavigate();
 
   return (
@@ -54,7 +58,7 @@ function App() {
               </div>
 
               <Container style={{ textAlign: "center" }}>
-                <Row>
+                <Row md={3}>
                   {shoes.map(({ id, title, content, price }, index) => {
                     return (
                       <ProductItem
@@ -68,6 +72,44 @@ function App() {
                   })}
                 </Row>
               </Container>
+              {
+                loading ? (
+                  <div style={{textAlign : "center"}}>
+                    loading...
+                  </div>
+                ) : null
+              }
+              
+              <div>
+                {
+                  moreBtn ? (
+                    <button onClick={()=>{
+                      let dataURL02 = 'https://codingapple1.github.io/shop/data2.json';
+                      let dataURL03 = 'https://codingapple1.github.io/shop/data3.json';
+
+                      setLoading(true);
+                      Promise.all([axios.get(dataURL02),axios.get(dataURL03)]).then(([res2,res3]) => {
+                        if(more === 0){
+                          console.log(res2.data);
+                          setShoes([...shoes,...res2.data])
+                        }else if(more === 1){
+                          console.log(res3.data);
+                          setShoes([...shoes,...res3.data])
+                          setMoreBtn(false)
+                        }
+                        setLoading(false);
+                        setMore(prev => prev+1);
+                      }).catch(() => {
+                        setLoading(false);
+                        setMoreBtn(false);
+                      })
+
+                      // axios.post('/saraar',{name : 'kim'})
+                    }}>버튼</button>
+                  ) : null
+                }
+                
+              </div>
             </>
           }
         />
