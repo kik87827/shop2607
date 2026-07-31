@@ -1,7 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { Nav } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 
 import styled from "styled-components"
+
+import { Context1 } from "../App";
+
 
 let YellowBtn = styled.button`
   background : ${ props => props.bg };
@@ -41,6 +45,20 @@ const Detail = ({ shoes }) => {
   let [warn,setWarn] = useState(false);
   let alertBox = useRef(null);
 
+  let [detail, setDetail] = useState("");
+  let loadTimer = 0;
+
+  let { storage } = useContext(Context1);
+
+  console.log(storage, shoes);
+
+  useEffect(() => {
+    setDetail("tran-end");
+    return () => {
+      setDetail("")
+    }
+  },[])
+
   useEffect(()=>{
     console.log('안녕')
     /* for (var i =0; i < 10000; i++){
@@ -75,43 +93,47 @@ const Detail = ({ shoes }) => {
   
   let filterItem = shoes.find((item) => item.id === paraId);
   let { title, price, content } = shoes[paraId];
+  let [tabActive, setTabActive] = useState(0);
   return (
-    <div className="container">
+    <div className={["container","tran-start", detail].filter(Boolean).join(" ")}>
       <div>
-        <input value={input} onChange={(e)=>{
-          const value = e.target.value;
-          setInput(e.target.value);
-          /* if(typeof etvalue !== "number"){
+        <input
+          value={input}
+          onChange={(e) => {
+            const value = e.target.value;
+            setInput(e.target.value);
+            /* if(typeof etvalue !== "number"){
             setWarn(true);
           } */
-          /* let etvalue = parseFloat(e.target.value);
+            /* let etvalue = parseFloat(e.target.value);
           console.log(typeof etvalue)
           if(typeof etvalue !== "number"){
             setWarn(true);
           } */
-        }} />
-        {
-          warn ? (<p style={{color : "red"}}>숫자만 입력하세요</p>) : null
-        }
-        
+          }}
+        />
+        {warn ? <p style={{ color: "red" }}>숫자만 입력하세요</p> : null}
       </div>
       <Box>
         {count}
-        <YellowBtn bg="blue" onClick={()=>{setCount(prev => prev + 1)}}>버튼</YellowBtn>
+        <YellowBtn
+          bg="blue"
+          onClick={() => {
+            setCount((prev) => prev + 1);
+          }}
+        >
+          버튼
+        </YellowBtn>
         <YellowBtn bg="orange">버튼</YellowBtn>
         <NewBtn bg="orange">버튼</NewBtn>
       </Box>
       <div className="alert alert-warning" ref={alertBox}>
         2초 이내 구매시 할인
       </div>
-      {
-        boxAlert ? (
-          <div className="alert alert-warning">
-            2초 이내 구매시 할인2
-          </div>
-        ) : null
-      }
-      
+      {boxAlert ? (
+        <div className="alert alert-warning">2초 이내 구매시 할인2</div>
+      ) : null}
+
       <div className="row">
         <div className="col-md-6">
           <img
@@ -128,8 +150,43 @@ const Detail = ({ shoes }) => {
           <button className="btn btn-danger">주문하기</button>
         </div>
       </div>
+
+      <Nav variant="tabs" defaultActiveKey={`link` + tabActive}>
+        <Nav.Item>
+          <Nav.Link onClick={() => setTabActive(0)} eventKey="link0">
+            탭1
+          </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link onClick={() => setTabActive(1)} eventKey="link1">
+            탭2
+          </Nav.Link>
+        </Nav.Item>
+      </Nav>
+      <TabContent tabActive={tabActive} shoes={shoes} />
     </div>
   );
 };
+
+
+function TabContent({ tabActive, shoes }) {
+  let [tabModi, setTabModi] = useState("");
+  let timer = 0;
+  let { storage } = useContext(Context1);
+  useEffect(() => {
+    timer = setTimeout(() => {
+      setTabModi("tran-end");
+    }, 50);
+    return () => {
+      clearTimeout(timer);
+      setTabModi("");
+    };
+  }, [tabActive]);
+  return (
+    <div className={["tran-start", tabModi].filter(Boolean).join(" ")}>
+      {[<div>탭1 {storage}</div>, <div>탭2 내용</div>][tabActive]}
+    </div>
+  );
+}
 
 export default Detail;
