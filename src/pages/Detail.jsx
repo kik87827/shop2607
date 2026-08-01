@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Nav } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import styled from "styled-components"
 
 import { Context1 } from "../App";
+import { pushProduct } from "../store/userCart";
+import { useDispatch } from "react-redux";
 
 
 let YellowBtn = styled.button`
@@ -50,7 +52,10 @@ const Detail = ({ shoes }) => {
 
   let { storage } = useContext(Context1);
 
-  console.log(storage, shoes);
+  let dispatch = useDispatch();
+  let navigate = useNavigate();
+
+  // console.log(storage, shoes);
 
   useEffect(() => {
     setDetail("tran-end");
@@ -79,10 +84,10 @@ const Detail = ({ shoes }) => {
 
   useEffect(() =>{
     if (!isNaN(input)) {
-      console.log("숫자");
+     // console.log("숫자");
         setWarn(false);
     } else {
-      console.log("숫자가 아님");
+      //console.log("숫자가 아님");
         setWarn(true);
     }
   },[input])
@@ -147,7 +152,10 @@ const Detail = ({ shoes }) => {
           <h4 className="pt-5">{filterItem.title}</h4>
           <p>{filterItem.content}</p>
           <p>{filterItem.price}원</p>
-          <button className="btn btn-danger">주문하기</button>
+          <button className="btn btn-danger" onClick={() => {
+            dispatch(pushProduct(filterItem));
+            navigate('/cart')
+          }}>주문하기</button>
         </div>
       </div>
 
