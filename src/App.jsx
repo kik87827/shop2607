@@ -2,7 +2,7 @@ import { Button, Col, Container, Nav, Navbar, Row } from "react-bootstrap";
 import "./App.css";
 import shoebg from "./assets/shoebg.png";
 import shoesData from "./data.js";
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import ProductItem from "./components/ProductItem.jsx";
 import { Link, Outlet, Route, Routes, useNavigate } from "react-router-dom";
 import Detail from "./pages/Detail.jsx";
@@ -12,12 +12,23 @@ import Cart from "./pages/Cart.jsx";
 export let Context1 = createContext();
 
 function App() {
+
+  let obj = { name: 'kim' }
+  localStorage.setItem("data", JSON.stringify(obj))
+  console.log(JSON.parse(localStorage.getItem("data")))
+
   let [shoes, setShoes] = useState(shoesData);
   let [more, setMore] = useState(0);
   let [moreBtn, setMoreBtn] = useState(true);
   let [loading, setLoading] = useState(false);
   let [storage, setStorage] = useState([10,11,12]);
   let navigate = useNavigate();
+
+   useEffect(() => {
+      if (!localStorage.getItem("watched")) {
+        localStorage.setItem("watched", JSON.stringify([]));
+      } 
+    }, [])
 
   return (
     <div className="App">

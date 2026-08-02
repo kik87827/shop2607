@@ -99,6 +99,16 @@ const Detail = ({ shoes }) => {
   let filterItem = shoes.find((item) => item.id === paraId);
   let { title, price, content } = shoes[paraId];
   let [tabActive, setTabActive] = useState(0);
+
+  useEffect(() => {
+    let watchedArray = JSON.parse(localStorage.getItem("watched"));
+    watchedArray.push(filterItem.id);
+    localStorage.setItem(
+      "watched",
+      JSON.stringify([...new Set(watchedArray)])
+    );
+  }, [])
+  
   return (
     <div className={["container","tran-start", detail].filter(Boolean).join(" ")}>
       <div>
