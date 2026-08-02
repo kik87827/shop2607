@@ -1,7 +1,7 @@
 import { Table } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { changeAge, userModify } from "../store/userSlice";
-import { changeCount } from "../store/userCart";
+import { changeCount, deleteProduct } from "../store/userCart";
 
 const Cart = () => {
   const user = useSelector((state) => state.user);
@@ -43,6 +43,9 @@ const Cart = () => {
                 >
                   +
                 </button>
+                <button onClick={() => {
+                  dispatch(deleteProduct(id));
+                }}>삭제</button>
               </td>
             </tr>
           ))}
