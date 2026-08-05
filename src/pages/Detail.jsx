@@ -108,6 +108,15 @@ const Detail = ({ shoes }) => {
       JSON.stringify([...new Set(watchedArray)])
     );
   }, [])
+
+  /* 
+    == 코드부터 짜는게 아니라 한글 먼저 쓰고 코드로 옮김 ==
+    누가 Detail 페이지 접속하면
+    그 페이지에 보이는 상품 id 가져와서
+    localStorage에 wached 항목에 추가
+
+    == 위 한글을 JS로 번역하면 코딩 끝임 ==
+  */
   
   return (
     <div className={["container","tran-start", detail].filter(Boolean).join(" ")}>
