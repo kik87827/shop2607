@@ -7,6 +7,7 @@ import styled from "styled-components"
 import { Context1 } from "../App";
 import { pushProduct } from "../store/userCart";
 import { useDispatch } from "react-redux";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 
 let YellowBtn = styled.button`
@@ -36,6 +37,8 @@ class Detail2 extends React.Component {
   }
 }
 
+/* let a = 0; */
+
 
 const Detail = ({ shoes }) => {
   let params = useParams();
@@ -56,6 +59,10 @@ const Detail = ({ shoes }) => {
   let navigate = useNavigate();
 
   // console.log(storage, shoes);
+
+  /* for(var i=0; i < 1e9; i++){
+    a = 1;
+  } */
 
   useEffect(() => {
     setDetail("tran-end");
@@ -117,6 +124,27 @@ const Detail = ({ shoes }) => {
 
     == 위 한글을 JS로 번역하면 코딩 끝임 ==
   */
+
+    let queryResult = useQuery({
+      queryKey: ['getName'],
+      refetchOnWindowFocus: false,
+      retry : 10, // default 3~4
+      queryFn: () => axios.get('https://codingapple1.github.io/userdata.json').then(result => result.data)
+    });
+  /* 
+    장점1. ajax 상태체크 쉬움
+    result.isPending
+    result.isSucces
+    result.error
+    장점2. 실패시 3~4번 재시도
+    장점3. 캐싱 알아서 해줌
+  */
+
+  // 캐싱된 데이터만 빼서 쓸 수도 있음
+  let q =  useQueryClient();
+  let qresult = q.getQueryData(['getName'])
+
+  console.log(qresult)
   
   return (
     <div className={["container","tran-start", detail].filter(Boolean).join(" ")}>

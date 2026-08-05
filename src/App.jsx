@@ -2,12 +2,17 @@ import { Button, Col, Container, Nav, Navbar, Row } from "react-bootstrap";
 import "./App.css";
 import shoebg from "./assets/shoebg.png";
 import shoesData from "./data.js";
-import { createContext, useEffect, useState } from "react";
+import { createContext, lazy, Suspense, useEffect, useState } from "react";
 import ProductItem from "./components/ProductItem.jsx";
 import { Link, Outlet, Route, Routes, useNavigate } from "react-router-dom";
-import Detail from "./pages/Detail.jsx";
+/* import Detail from "./pages/Detail.jsx"; */
+/* import Cart from "./pages/Cart.jsx"; */
+
+const Detail = lazy(() => import('./pages/Detail.jsx'));
+const Cart = lazy(() => import('./pages/Cart.jsx'));
+
 import axios from "axios";
-import Cart from "./pages/Cart.jsx";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export let Context1 = createContext();
 
@@ -15,7 +20,7 @@ function App() {
 
   let obj = { name: 'kim' }
   localStorage.setItem("data", JSON.stringify(obj))
-  console.log(JSON.parse(localStorage.getItem("data")))
+  //console.log(JSON.parse(localStorage.getItem("data")))
 
   let [shoes, setShoes] = useState(shoesData);
   let [more, setMore] = useState(0);
@@ -24,15 +29,32 @@ function App() {
   let [storage, setStorage] = useState([10,11,12]);
   let navigate = useNavigate();
 
-   useEffect(() => {
-      if (!localStorage.getItem("watched")) {
-        localStorage.setItem("watched", JSON.stringify([]));
-      } 
-    }, [])
+  useEffect(() => {
+    if (!localStorage.getItem("watched")) {
+      localStorage.setItem("watched", JSON.stringify([]));
+    } 
+  }, [])
+
+  let queryResult = useQuery({
+    queryKey: ['getName'],
+    refetchOnWindowFocus: false,
+    retry : 10, // default 3~4
+    queryFn: () => axios.get('https://codingapple1.github.io/userdata.json').then(result => result.data)
+  });
+  /* 
+    장점1. ajax 상태체크 쉬움
+    result.isPending
+    result.isSucces
+    result.error
+    장점2. 실패시 3~4번 재시도
+    장점3. 캐싱 알아서 해줌
+  */
+
+  
 
   return (
     <div className="App">
-      <Navbar bg="dark" data-bs-theme="dark">
+      <Navbar>
         <Container>
           <Navbar.Brand href="#home">ShoeShop</Navbar.Brand>
           <Nav className="me-auto">
@@ -40,6 +62,11 @@ function App() {
             <Nav.Link onClick={() => navigate("/detail/0")}>Detail</Nav.Link>
             <Nav.Link onClick={() => navigate("/cart")}>Cart</Nav.Link>
           </Nav>
+          <div className="ms-auto">
+            {queryResult.isPending && '로딩중'}
+            {queryResult.isError && '에러남'}
+            {queryResult.isSuccess && queryResult.data?.name}
+          </div>
         </Container>
       </Navbar>
 
@@ -138,7 +165,9 @@ function App() {
           path={`/detail/:id`}
           element={
             <Context1.Provider value={{ storage, shoes }}>
-              <Detail shoes={shoes} />
+              <Suspense fallback={<>로딩중</>}>
+                <Detail shoes={shoes} />
+              </Suspense>
             </Context1.Provider>
           }
         />
@@ -150,7 +179,7 @@ function App() {
           <Route path="one" element={<>첫 주문시 양배추즙 서비스</>} />
           <Route path="two" element={<>생일기념 쿠폰받기</>} />
         </Route>
-        <Route path="/cart" element={<Cart />} />
+        <Route path="/cart" element={<Suspense fallback={<>로딩중</>}><Cart /></Suspense>} />
         <Route path="*" element={<div>404</div>} />
       </Routes>
     </div>
