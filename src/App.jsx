@@ -2,7 +2,7 @@ import { Button, Col, Container, Nav, Navbar, Row } from "react-bootstrap";
 import "./App.css";
 import shoebg from "./assets/shoebg.png";
 import shoesData from "./data.js";
-import { createContext, lazy, Suspense, useEffect, useState } from "react";
+import { createContext, lazy, Suspense, useDeferredValue, useEffect, useState, useTransition } from "react";
 import ProductItem from "./components/ProductItem.jsx";
 import { Link, Outlet, Route, Routes, useNavigate } from "react-router-dom";
 /* import Detail from "./pages/Detail.jsx"; */
@@ -28,6 +28,10 @@ function App() {
   let [loading, setLoading] = useState(false);
   let [storage, setStorage] = useState([10,11,12]);
   let navigate = useNavigate();
+  let [name,setName] = useState("");
+  let [isPadding,startTransition] = useTransition();
+  let statedef = useDeferredValue(name); // 여기 넣은게 변동사항이 생기면 늦게 처리해줌
+  let a = new Array(10000).fill(0);
 
   useEffect(() => {
     if (!localStorage.getItem("watched")) {
@@ -182,6 +186,30 @@ function App() {
         <Route path="/cart" element={<Suspense fallback={<>로딩중</>}><Cart /></Suspense>} />
         <Route path="*" element={<div>404</div>} />
       </Routes>
+
+      {name}
+
+      <input onChange={(e) => {
+        // 성능 저하를 일으킬만한 것 감싸기
+        // 브라우저는 single-thereaded
+        /* 
+          늦게 처리 도와줌 
+
+          isPadding 처리중일 때 true
+
+          1. 먼저 a를 <input>에 보여주기
+          2. 한가할 때 <div> x 10000개 만들기
+        */
+        startTransition(()=>{
+          setName(e.target.value) // 코드 시작을 뒤로 늦춰줌
+        })
+      }} />
+      {
+        
+      }
+      {
+        isPadding ? '로딩중' : a.map(() => <div>{statedef}</div>)
+      }
     </div>
   );
 }
